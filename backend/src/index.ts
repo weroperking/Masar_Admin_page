@@ -49,18 +49,18 @@ async function ensureAdminUsersTable(pool: Pool) {
       );
     `);
     
-    // Always guarantee access for admin@masar.com
+    // Always guarantee access for admin@masar.top
     const hash = await bcrypt.hash('MasarAdmin2026!', 10);
-    const { rows } = await pool.query('SELECT id FROM admin_users WHERE email = $1', ['admin@masar.com']);
+    const { rows } = await pool.query('SELECT id FROM admin_users WHERE email = $1', ['admin@masar.top']);
     
     if (rows.length > 0) {
-      await pool.query('UPDATE admin_users SET password_hash = $1 WHERE email = $2', [hash, 'admin@masar.com']);
+      await pool.query('UPDATE admin_users SET password_hash = $1 WHERE email = $2', [hash, 'admin@masar.top']);
     } else {
       // Use a standard UUID string which satisfies both TEXT and UUID column types
       const newId = '11111111-1111-1111-1111-111111111111';
       await pool.query(
         'INSERT INTO admin_users (id, email, password_hash) VALUES ($1, $2, $3)',
-        [newId, 'admin@masar.com', hash]
+        [newId, 'admin@masar.top', hash]
       );
     }
   } catch (err) {
