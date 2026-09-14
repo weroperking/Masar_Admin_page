@@ -22,15 +22,38 @@ export function Login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed');
+      
+      let data: any = null;
+      const text = await res.text();
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = null;
+        }
+      }
+
+      if (!res.ok) {
+        if (res.status === 405) {
+          throw new Error('API route returned 405 Method Not Allowed. Check that Cloudflare Pages Functions are deployed with functions/api/[[route]].ts and secrets are configured.');
+        }
+        throw new Error(data?.error || `Login failed (HTTP ${res.status}: ${res.statusText || 'Error'})`);
+      }
       
       const meRes = await fetch('/api/auth/me');
-      const meData = await meRes.json();
-      setUser(meData.user);
+      let meData: any = null;
+      if (meRes.ok) {
+        const meText = await meRes.text();
+        if (meText) {
+          try {
+            meData = JSON.parse(meText);
+          } catch {}
+        }
+      }
+      setUser(meData?.user || data?.user || null);
       navigate('/');
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }

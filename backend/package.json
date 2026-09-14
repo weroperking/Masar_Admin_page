@@ -8,7 +8,8 @@
   "dependencies": {
     "hono": "^4.0.0",
     "bcryptjs": "^2.4.3",
-    "jose": "^5.2.0"
+    "jose": "^5.2.0",
+    "@neondatabase/serverless": "^1.1.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240222.0",

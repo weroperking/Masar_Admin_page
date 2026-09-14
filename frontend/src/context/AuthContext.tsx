@@ -15,10 +15,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetch('/api/auth/me')
-      .then(res => res.json())
-      .then(data => {
-        if (data.user) setUser(data.user);
+      .then(async res => {
+        if (!res.ok) return null;
+        const text = await res.text();
+        if (!text) return null;
+        try {
+          return JSON.parse(text);
+        } catch {
+          return null;
+        }
       })
+      .then(data => {
+        if (data?.user) setUser(data.user);
+      })
+      .catch(() => {})
       .finally(() => setIsLoading(false));
   }, []);
 
