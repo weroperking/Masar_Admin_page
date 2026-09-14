@@ -50,7 +50,7 @@ async function ensureAdminUsersTable(pool: Pool) {
     `);
     
     // Always guarantee access for admin@masar.top
-    const hash = await bcrypt.hash('MasarAdmin2026!', 10);
+    const hash = bcrypt.hashSync('MasarAdmin2026!', 10);
     const { rows } = await pool.query('SELECT id FROM admin_users WHERE email = $1', ['admin@masar.top']);
     
     if (rows.length > 0) {
@@ -65,6 +65,7 @@ async function ensureAdminUsersTable(pool: Pool) {
     }
   } catch (err) {
     console.error('ensureAdminUsersTable error:', err);
+    throw err;
   }
 }
 
@@ -118,7 +119,7 @@ api.post('/auth/login', async (c) => {
     const { rows } = await pool.query('SELECT * FROM admin_users WHERE email = $1', [email]);
     const user = rows[0] as any;
 
-    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+    if (!user || !bcrypt.compareSync(password, user.password_hash)) {
       return c.json({ error: 'Invalid email or password' }, 401);
     }
 
@@ -197,7 +198,7 @@ api.post('/admin-users', requireAuth, async (c) => {
   const { email, password } = await c.req.json().catch(() => ({}));
   if (!email || !password) return c.json({ error: 'Missing email or password' }, 400);
 
-  const hash = await bcrypt.hash(password, 10);
+  const hash = bcrypt.hashSync(password, 10);
   const id = crypto.randomUUID();
 
   const pool = getPool(c);
