@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ArrowLeft, Building2, MapPin, Users, GitBranch } from 'lucide-react';
@@ -6,6 +6,7 @@ import type { Organization } from '../types';
 
 export function OrgDetail() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
 
   const { data: response, isLoading } = useQuery<{ org: any }>({
     queryKey: ['org', id],
@@ -13,6 +14,21 @@ export function OrgDetail() {
       const res = await fetch(`/api/orgs/${id}`);
       if (!res.ok) throw new Error('Failed to fetch org');
       return res.json();
+    }
+  });
+
+  const changePlanMutation = useMutation({
+    mutationFn: async (plan: string) => {
+      const res = await fetch(`/api/orgs/${id}/plan-override`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan })
+      });
+      if (!res.ok) throw new Error('Failed to change plan');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['org', id] });
+      queryClient.invalidateQueries({ queryKey: ['orgs'] });
     }
   });
 
@@ -61,7 +77,16 @@ export function OrgDetail() {
             <Building2 className="w-5 h-5" />
             <span className="font-medium">Current Plan</span>
           </div>
-          <p className="text-3xl font-semibold text-neutral-900 capitalize">{org.plan}</p>
+          <select
+            value={org.plan}
+            onChange={(e) => changePlanMutation.mutate(e.target.value)}
+            className="text-3xl font-semibold text-neutral-900 capitalize border-0 bg-transparent focus:ring-0 cursor-pointer p-0 w-full"
+            disabled={changePlanMutation.isPending}
+          >
+            <option value="trial">Trial</option>
+            <option value="basic">Basic</option>
+            <option value="growth">Growth</option>
+          </select>
         </div>
       </div>
 

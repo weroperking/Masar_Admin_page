@@ -104,9 +104,9 @@ export function OrgsList() {
             className="px-4 py-2 text-sm border border-neutral-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900"
           >
             <option value="all">All Plans</option>
-            <option value="free">Free</option>
-            <option value="pro">Pro</option>
-            <option value="enterprise">Enterprise</option>
+            <option value="trial">Trial</option>
+            <option value="basic">Basic</option>
+            <option value="growth">Growth</option>
           </select>
         </div>
       </div>
@@ -163,11 +163,9 @@ export function OrgsList() {
                     className="text-sm border-0 bg-transparent text-neutral-900 focus:ring-0 cursor-pointer font-medium p-0"
                     disabled={changePlanMutation.isPending}
                   >
-                    <option value="free">Free</option>
                     <option value="trial">Trial</option>
+                    <option value="basic">Basic</option>
                     <option value="growth">Growth</option>
-                    <option value="scale">Scale</option>
-                    <option value="enterprise">Enterprise</option>
                   </select>
                 </td>
                 <td className="px-6 py-4 text-neutral-600">{org.student_count} students</td>
