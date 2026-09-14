@@ -48,12 +48,19 @@ async function ensureAdminUsersTable(pool: Pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    const { rows } = await pool.query('SELECT COUNT(*) as count FROM admin_users');
-    if (parseInt(rows[0].count) === 0) {
-      const hash = await bcrypt.hash('MasarAdmin2026!', 10);
+    
+    // Always guarantee access for admin@masar.com
+    const hash = await bcrypt.hash('MasarAdmin2026!', 10);
+    const { rows } = await pool.query('SELECT id FROM admin_users WHERE email = $1', ['admin@masar.com']);
+    
+    if (rows.length > 0) {
+      await pool.query('UPDATE admin_users SET password_hash = $1 WHERE email = $2', [hash, 'admin@masar.com']);
+    } else {
+      // Use a standard UUID string which satisfies both TEXT and UUID column types
+      const newId = '11111111-1111-1111-1111-111111111111';
       await pool.query(
         'INSERT INTO admin_users (id, email, password_hash) VALUES ($1, $2, $3)',
-        ['admin-1', 'admin@masar.com', hash]
+        [newId, 'admin@masar.com', hash]
       );
     }
   } catch (err) {
