@@ -18,7 +18,7 @@ function checkEnv(c: any, required: (keyof Bindings)[]) {
   const missing = required.filter(k => !c.env || !c.env[k]);
   if (missing.length > 0) {
     return c.json({
-      error: `Missing environment variable(s) in Cloudflare Pages Settings: ${missing.join(', ')}. Please add them in the Cloudflare Pages dashboard under Settings > Variables and Secrets.`
+      error: `Missing environment variable(s): ${missing.join(', ')}. Note: If you just added them in the Cloudflare Dashboard, you MUST trigger a new deployment for them to take effect.`
     }, 500);
   }
   return null;
